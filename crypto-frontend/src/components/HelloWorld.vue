@@ -4,13 +4,19 @@
       <v-col >
         <v-btn
           fab
-          color="blue"
-          dark
           @click="sheet = !sheet"
           left
         >
-          <v-icon>mdi-plus</v-icon>
+          <v-avatar
+            size="55px"
+          >
+            <v-img
+              src="https://cdn.coindcx.com/static/coins/inr.svg"
+            ></v-img>
+          </v-avatar>
         </v-btn>
+      </v-col>
+      <v-col >
         <v-text-field
           v-model="num_of_USDT"
           label="NO. of USDT"
@@ -93,13 +99,6 @@
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
-                  <!-- <v-list-item-icon>
-                    <v-avatar
-                      size="20px"
-                    >
-                    <v-img src="https://cdn.coindcx.com/static/coins/usdt.svg" ></v-img>
-                    </v-avatar>
-                  </v-list-item-icon> -->
 
                   <v-list-item-title> US Dollar Token </v-list-item-title>
           
@@ -108,13 +107,6 @@
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
-                  <!-- <v-list-item-icon>
-                    <v-avatar
-                      size="20px"
-                    >
-                    <v-img :src="`https://cdn.coindcx.com/static/coins/${selected_coin.currency.toLowerCase()}.svg`" ></v-img>
-                    </v-avatar>
-                  </v-list-item-icon> -->
 
                   <v-list-item-title> {{ selected_coin.coin_name }} </v-list-item-title>
           
@@ -123,13 +115,6 @@
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
-                  <!-- <v-list-item-icon>
-                    <v-avatar
-                      size="20px"
-                    >
-                    <v-img :src="`https://cdn.coindcx.com/static/coins/${selected_coin.currency.toLowerCase()}.svg`" ></v-img>
-                    </v-avatar>
-                  </v-list-item-icon> -->
 
                   <v-list-item-title> Predicted Profit </v-list-item-title>
           
@@ -176,9 +161,47 @@
                     color="grey lighten-1"
                     height="200px"
                   >
-                  
-                  
-                  
+                    <v-row>
+                      <v-col>
+                        <v-layout column style="height: 50vh">       
+                          <v-flex md6 style="overflow: auto">       
+                            <v-data-table
+                              dense
+                              :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
+                              :items='order_book_data["I-USDT_INR"]["asks"]'
+                              item-key="name"
+                              :sort-by="['price']"
+                              :sort-desc="[false]"
+                              class="elevation-1"
+                              hide-default-footer
+                            ></v-data-table>
+                            </v-flex>
+                        </v-layout>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-layout column style="height: 50vh">       
+                          <v-flex md6 style="overflow: auto">       
+                            <v-data-table
+                              dense
+                              :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
+                              :items='order_book_data["I-USDT_INR"]["bids"]'
+                              item-key="name"
+                              :sort-by="['price']"
+                              :sort-desc="[true]"
+                              class="elevation-1"
+                              hide-default-footer
+                            ></v-data-table>
+                            </v-flex>
+                        </v-layout>
+                        </v-col>
+                    </v-row>
+                          <!-- <div v-for='(price, qty) in order_book_data["I-USDT_INR"]["data"]["asks"]' :key="item" >
+                            <span>{{ price + ' : '+ qty}}</span>
+                          </div> -->
+                          <!-- {{ order_book_data["I-USDT_INR"]["data"]["bids"] }} -->
+                      
                   </v-card>
 
                   <v-btn text disabled>
@@ -313,7 +336,9 @@ export default {
       coin_price_data:[],
       user_owned_coins:[],
       user_available_coin: 0,
-      predicted_profit: 0
+      predicted_profit: 0,
+      market_order_book_intervals:[],
+      order_book_data:{}
     }
   },
   mounted(){
@@ -340,9 +365,15 @@ export default {
 
     },
     select_currency(item){
+      this.market_order_book_intervals.forEach(element => {
+        clearInterval(element);
+      });
       console.log(item);
       this.selected_coin = item;
       this.predicted_profit = item['p&l'];
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair']); }, this.ticker_frequency));
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair']); }, this.ticker_frequency));
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book("I-USDT_INR"); }, this.ticker_frequency));
     },
     __get_market_details(){
       this.loading_data = true;
@@ -383,17 +414,18 @@ export default {
       this.loading_data = false;
     },
     __get_order_book(pair){
-      axios.get(this.public_baseurl+"/market_data/orderbook",{
-        pair: pair
-      })
+      axios.get(this.public_baseurl+"/market_data/orderbook?pair="+pair)
       .then((response) => {
-        // console.log(response);
-        console.log("GOt order book details for " + pair);
-        this.coin_order_book[pair] = response.data;
+        // console.log("GOt order book details for " + pair);
+        this.order_book_data[pair] = {"bids":[], "asks":[]};
+        Object.entries(response.data.bids).forEach(([price, qty]) => { this.order_book_data[pair]["bids"].push({"qty":qty, "price": price}); });
+        Object.entries(response.data.asks).forEach(([price, qty]) => { this.order_book_data[pair]["asks"].push({"qty":qty, "price": price}); });
+
+        // this.coin_order_book[pair] = response.data;
       })
       .catch(function (error) {
         console.log(error);
-        alert("Issue in getting market data");
+        alert("Issue in getting order book data of "+pair);
       }) 
     },
     __get_trade_history(pair, limi=30){
@@ -492,7 +524,7 @@ export default {
         if(this.user_owned_coins.length == 0) return 0;
         let coin = this.user_owned_coins.filter((coin)=> {  return coin.currency == currency });
         this.user_available_coin =  coin[0]["balance"]
-    }
+    },
   },
   computed:{
     user_available_inr(){
