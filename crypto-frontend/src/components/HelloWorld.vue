@@ -196,12 +196,7 @@
                             </v-flex>
                         </v-layout>
                         </v-col>
-                    </v-row>
-                          <!-- <div v-for='(price, qty) in order_book_data["I-USDT_INR"]["data"]["asks"]' :key="item" >
-                            <span>{{ price + ' : '+ qty}}</span>
-                          </div> -->
-                          <!-- {{ order_book_data["I-USDT_INR"]["data"]["bids"] }} -->
-                      
+                    </v-row>                      
                   </v-card>
 
                   <v-btn text disabled>
@@ -222,7 +217,45 @@
                     class="mb-12"
                     color="grey lighten-1"
                     height="200px"
-                  ></v-card>
+                  >
+                    <v-row>
+                      <v-col>
+                        <v-layout column style="height: 50vh">       
+                          <v-flex md6 style="overflow: auto">       
+                            <v-data-table
+                              dense
+                              :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
+                              :items='order_book_data[coin_of_interest[selected_coin.coin_name]["USDT"]["pair"]]["asks"]'
+                              item-key="name"
+                              :sort-by="['price']"
+                              :sort-desc="[false]"
+                              class="elevation-1"
+                              hide-default-footer
+                            ></v-data-table>
+                            </v-flex>
+                        </v-layout>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-layout column style="height: 50vh">       
+                          <v-flex md6 style="overflow: auto">       
+                            <v-data-table
+                              dense
+                              :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
+                              :items='order_book_data[coin_of_interest[selected_coin.coin_name]["USDT"]["pair"]]["bids"]'
+                              item-key="name"
+                              :sort-by="['price']"
+                              :sort-desc="[true]"
+                              class="elevation-1"
+                              hide-default-footer
+                            ></v-data-table>
+                            </v-flex>
+                        </v-layout>
+                        </v-col>
+                    </v-row>                      
+                  
+                  </v-card>
 
                   <v-btn text @click="current_step = 1">
                     Back
@@ -242,7 +275,44 @@
                     class="mb-12"
                     color="grey lighten-1"
                     height="200px"
-                  ></v-card>
+                  >
+                  <v-row>
+                      <v-col>
+                        <v-layout column style="height: 50vh">       
+                          <v-flex md6 style="overflow: auto">       
+                            <v-data-table
+                              dense
+                              :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
+                              :items='order_book_data[coin_of_interest[selected_coin.coin_name]["INR"]["pair"]]["asks"]'
+                              item-key="name"
+                              :sort-by="['price']"
+                              :sort-desc="[false]"
+                              class="elevation-1"
+                              hide-default-footer
+                            ></v-data-table>
+                            </v-flex>
+                        </v-layout>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-layout column style="height: 50vh">       
+                          <v-flex md6 style="overflow: auto">       
+                            <v-data-table
+                              dense
+                              :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
+                              :items='order_book_data[coin_of_interest[selected_coin.coin_name]["INR"]["pair"]]["bids"]'
+                              item-key="name"
+                              :sort-by="['price']"
+                              :sort-desc="[true]"
+                              class="elevation-1"
+                              hide-default-footer
+                            ></v-data-table>
+                            </v-flex>
+                        </v-layout>
+                        </v-col>
+                    </v-row> 
+                  </v-card>
 
                   <v-btn text @click="current_step = 2">
                     Back
@@ -338,7 +408,7 @@ export default {
       user_available_coin: 0,
       predicted_profit: 0,
       market_order_book_intervals:[],
-      order_book_data:{}
+      order_book_data:{},
     }
   },
   mounted(){
@@ -371,8 +441,9 @@ export default {
       console.log(item);
       this.selected_coin = item;
       this.predicted_profit = item['p&l'];
+      this.order_book_data = {};
       this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair']); }, this.ticker_frequency));
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair']); }, this.ticker_frequency));
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['INR']['pair']); }, this.ticker_frequency));
       this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book("I-USDT_INR"); }, this.ticker_frequency));
     },
     __get_market_details(){
