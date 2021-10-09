@@ -1,6 +1,6 @@
 <template>
     <v-app id="app">
-      <v-content class="mx-4 mb-4">
+      <v-content>
         <router-view app></router-view>
       </v-content>
     </v-app>
