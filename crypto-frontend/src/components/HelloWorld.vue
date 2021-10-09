@@ -122,6 +122,14 @@
                     {{ predicted_profit }}
                   </v-list-item-subtitle>
                 </v-list-item>
+                <v-list-item>
+
+                  <v-list-item-title> Current Profit </v-list-item-title>
+          
+                  <v-list-item-subtitle class="text-right">
+                    {{ predicted_profit }}
+                  </v-list-item-subtitle>
+                </v-list-item>
               </v-list>
             </v-col>
           </v-row>
@@ -409,6 +417,9 @@ export default {
       predicted_profit: 0,
       market_order_book_intervals:[],
       order_book_data:{},
+      fastest_usdt_price:0,
+      fastest_usdt_to_coin_price:0,
+      fastest_coint_to_inr:0
     }
   },
   mounted(){
@@ -563,13 +574,13 @@ export default {
 
       for(let coin in this.coin_of_interest){
         
-        let transaction_fee = this.num_of_USDT * 0.08
+        let transaction_fee = (this.USDT_INR_price * this.num_of_USDT) / 1000 // fee is 0.1%
         let inr_invested = (this.USDT_INR_price * this.num_of_USDT) + transaction_fee // INR -> USDT 
         
-        transaction_fee = this.num_of_USDT/1000
+        transaction_fee = this.num_of_USDT / 500 // fee is 0.2%          
         let num_of_AltCoin = (this.num_of_USDT - transaction_fee) / this.coin_of_interest[coin]['USDT']['last_price'] //USDT -> AltCoin
 
-        transaction_fee = (num_of_AltCoin * this.coin_of_interest[coin]['INR']['last_price']) / 1000
+        transaction_fee = (num_of_AltCoin * this.coin_of_interest[coin]['INR']['last_price']) / 500 // fee is 0.2 %
         let inr_returned = (num_of_AltCoin * this.coin_of_interest[coin]['INR']['last_price']) - transaction_fee // AltCoin -> INR 
 
         let p_and_l = inr_returned - inr_invested;
@@ -608,7 +619,11 @@ export default {
         let inr_coin = this.user_owned_coins.filter((coin)=> {  return coin.currency == "USDT" });
         return inr_coin[0]["balance"]
     },
+    selected_coin_current_order_book_cal(){
+      this.fastest_usdt_price
 
+      return 0
+    }
   },
   watch:{
     market_details(){
