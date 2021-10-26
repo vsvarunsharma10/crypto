@@ -97,6 +97,22 @@
               </v-list>
             </v-col>
           </v-row>
+
+          <!-- <v-row>
+            <v-col>
+              <v-text-field label="USDT price"
+                    v-model="num_of_USDT"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field label="No. of USDT"
+                    v-model="num_of_USDT"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              {{ num_of_USDT* }}
+            </v-col>
+          </v-row> -->
           
           <v-card-text>
             <v-card>
@@ -127,6 +143,7 @@
                             :sort-by="['price']"
                             :sort-desc="[false]"
                             class="elevation-1"
+                            style="color:#e04d5c"
                             hide-default-footer
                           ></v-data-table>
                         </v-col>
@@ -140,6 +157,7 @@
                             :sort-by="['price']"
                             :sort-desc="[true]"
                             class="elevation-1"
+                            style="color:#1f9358;"
                             hide-default-footer
                           ></v-data-table>
                         </v-col>
@@ -160,6 +178,7 @@
                             item-key="name"
                             :sort-by="['price']"
                             :sort-desc="[false]"
+                            style="color:#e04d5c"
                             class="elevation-1"
                             hide-default-footer
                           ></v-data-table>
@@ -174,6 +193,7 @@
                             :sort-by="['price']"
                             :sort-desc="[true]"
                             class="elevation-1"
+                            style="color:#1f9358;"
                             hide-default-footer
                           ></v-data-table>
                         </v-col>
@@ -194,6 +214,7 @@
                             item-key="name"
                             :sort-by="['price']"
                             :sort-desc="[false]"
+                            style="color:#e04d5c"
                             class="elevation-1"
                             hide-default-footer
                           ></v-data-table>
@@ -208,6 +229,7 @@
                             :sort-by="['price']"
                             :sort-desc="[true]"
                             class="elevation-1"
+                            style="color:#1f9358;"
                             hide-default-footer
                           ></v-data-table>
                           </v-col>
@@ -296,6 +318,7 @@ export default {
       user_owned_coins:[],
       user_available_coin: 0,
       predicted_profit: 0,
+      current_profit: 0,
       market_order_book_intervals:[],
       order_book_data:{},
       fastest_usdt_price:0,
@@ -335,9 +358,9 @@ export default {
       this.selected_coin = item;
       this.predicted_profit = item['p&l'];
       this.order_book_data = {};
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair']); }, 2000));
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['INR']['pair']); }, 2000));
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book("I-USDT_INR"); }, 2000));
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair'], "Bids"); }, 2000));
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['INR']['pair'], "Asks"); }, 2000));
+      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book("I-USDT_INR", "Bids"); }, 2000));
     },
     __get_market_details(){
       this.loading_data = true;
@@ -377,7 +400,7 @@ export default {
       this.coin_of_interest = coin_of_interest;
       this.loading_data = false;
     },
-    __get_order_book(pair){
+    __get_order_book(pair, trade_type){
       axios.get(this.public_baseurl+"/market_data/orderbook?pair="+pair)
       .then((response) => {
         // console.log("GOt order book details for " + pair);
@@ -502,6 +525,14 @@ export default {
     selected_coin_current_order_book_cal(){
       this.fastest_usdt_price
 
+      return 0
+    },
+    current_profit(){
+      // for((order_book, key) in order_book_data){
+      //   for(order){
+
+      //   }
+      // }
       return 0
     }
   },
