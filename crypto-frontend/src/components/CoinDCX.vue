@@ -6,7 +6,7 @@
           <v-card-title>
             <v-row>
               <v-col class="col-1" >
-                <v-btn x-small fab @click="sheet = !sheet" left >
+                <v-btn x-small fab @click="is_sheet_visible = !is_sheet_visible" left >
                   <v-avatar size="32px" >
                     <v-img src="https://cdn.coindcx.com/static/coins/inr.svg"></v-img>
                   </v-avatar>
@@ -116,39 +116,51 @@
           
           <v-card-text>
             <v-card>
-              <v-tabs v-model="current_step">
-                <v-tab>
-                  Buy USDT
-                </v-tab>
-                <v-tab> 
-                  Buy AltCoin
-                </v-tab>
-                <v-tab>
-                  Sell AltCoin
-                </v-tab>
-              </v-tabs>
 
-              <v-tabs-items v-model="current_step">
-                <v-tab-item>
-                  <v-card flat>
-                    <v-card-text v-if='order_book_data["I-USDT_INR"]'>
-                      <v-row>
-                        <v-col style="overflow: auto;height: 40vh">
-                          Asks
+              <div style="display:inline-flex" >
+                <v-container class="grey lighten-5">
+                  <v-row no-gutters>
+                    <!-- <template v-for="n in 4"> -->
+                      <v-col style="width:60px" >
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile = "ASKs"
+                        >
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
                             :items='order_book_data["I-USDT_INR"]["asks"]'
                             item-key="name"
                             :sort-by="['price']"
-                            :sort-desc="[false]"
+                            :sort-desc="[true]"
                             class="elevation-1"
                             style="color:#e04d5c"
                             hide-default-footer
                           ></v-data-table>
-                        </v-col>
-                        <v-col style="overflow: auto; height: 40vh">    
-                          Bids
+                        </v-card>
+                      </v-col>
+                      
+                      <v-responsive width="100%" ></v-responsive>
+
+                      <v-col >
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile
+                        >
+                          {{ current_USDT_INR_price }}
+                        </v-card>
+                      </v-col>
+
+                      <v-responsive width="100%" ></v-responsive>
+                      
+                      <v-col style="width:60px">
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile = "BIDs"
+                        >
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
@@ -160,31 +172,54 @@
                             style="color:#1f9358;"
                             hide-default-footer
                           ></v-data-table>
-                        </v-col>
-                      </v-row>    
-                    </v-card-text>
-                  </v-card>
-                </v-tab-item>
-                <v-tab-item>
-                  <v-card flat>
-                    <v-card-text v-if='order_book_data[coin_of_interest[selected_coin.coin_name]["USDT"]["pair"]]'>
-                      <v-row>
-                        <v-col style="overflow: auto; height: 40vh">
-                          Asks 
+                        </v-card>
+                      </v-col>
+                    <!-- </template> -->
+                  </v-row>
+                </v-container> 
+                <v-container class="grey lighten-5">
+                  <v-row no-gutters>
+                    <!-- <template v-for="n in 4"> -->
+                      <v-col style="width:60px" >
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile = "ASKs"
+                        >
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
                             :items='order_book_data[coin_of_interest[selected_coin.coin_name]["USDT"]["pair"]]["asks"]'
                             item-key="name"
                             :sort-by="['price']"
-                            :sort-desc="[false]"
+                            :sort-desc="[true]"
                             style="color:#e04d5c"
                             class="elevation-1"
                             hide-default-footer
                           ></v-data-table>
-                        </v-col>
-                        <v-col style="overflow: auto; height: 40vh">  
-                          Bids    
+                        </v-card>
+                      </v-col>
+                      
+                      <v-responsive width="100%" ></v-responsive>
+
+                      <v-col >
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile
+                        >
+                          {{ current_AltCoin_USDT_price}}
+                        </v-card>
+                      </v-col>
+
+                      <v-responsive width="100%" ></v-responsive>
+                      
+                      <v-col style="width:60px">
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile = "BIDs"
+                        >
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
@@ -196,31 +231,54 @@
                             style="color:#1f9358;"
                             hide-default-footer
                           ></v-data-table>
-                        </v-col>
-                      </v-row>
-                    </v-card-text>
-                  </v-card>
-                </v-tab-item>
-                <v-tab-item>
-                  <v-card flat>
-                    <v-card-text v-if='order_book_data[coin_of_interest[selected_coin.coin_name]["INR"]["pair"]]'>
-                      <v-row>
-                        <v-col style="overflow: auto;height: 40vh">  
-                          Asks 
+                        </v-card>
+                      </v-col>
+                    <!-- </template> -->
+                  </v-row>
+                </v-container>
+                <v-container class="grey lighten-5">
+                  <v-row no-gutters>
+                    <!-- <template v-for="n in 4"> -->
+                      <v-col style="width:60px" >
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile = "ASKs"
+                        >
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
                             :items='order_book_data[coin_of_interest[selected_coin.coin_name]["INR"]["pair"]]["asks"]'
                             item-key="name"
                             :sort-by="['price']"
-                            :sort-desc="[false]"
+                            :sort-desc="[true]"
                             style="color:#e04d5c"
                             class="elevation-1"
                             hide-default-footer
                           ></v-data-table>
-                        </v-col>
-                        <v-col style="overflow: auto;height: 40vh">
-                          Bids       
+                        </v-card>
+                      </v-col>
+                      
+                      <v-responsive width="100%" ></v-responsive>
+
+                      <v-col >
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile
+                        >
+                          {{ current_INR_AltCoin_price }}
+                        </v-card>
+                      </v-col>
+
+                      <v-responsive width="100%" ></v-responsive>
+                      
+                      <v-col style="width:60px">
+                        <v-card
+                          class="pa-2"
+                          outlined
+                          tile = "BIDs"
+                        >
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
@@ -232,18 +290,18 @@
                             style="color:#1f9358;"
                             hide-default-footer
                           ></v-data-table>
-                          </v-col>
-                      </v-row> 
-                    </v-card-text>
-                  </v-card>
-                </v-tab-item>
-              </v-tabs-items>
+                        </v-card>
+                      </v-col>
+                    <!-- </template> -->
+                  </v-row>
+                </v-container>  
+              </div>  
             </v-card>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-    <v-bottom-sheet v-model="sheet">
+    <v-bottom-sheet v-model="is_sheet_visible">
       <v-sheet
         class="text-center"
       >
@@ -281,25 +339,19 @@ const axios = require('axios');
 const crypto = require('crypto');
 
 export default {
-  name: 'HelloWorld',
   data () {
     return {
-      current_step: 0,
-      search_str: '',
-      drawer: true,
-      sheet: false,
-      loading_data: true,
+      is_sheet_visible: false,
       selected_coin: undefined,
+      search_str: '',
+      loading_data: true,
       coin_market_name_mapping : {},
       market_details : {},
       coin_of_interest : {},
-      coin_order_book : {},
       coin_trade_history : {},
       ticker_data : {},
       ticker_frequency : 1000, // 1 sec
       num_of_USDT : 1000,
-      USDT_INR_price : 0,
-      USDT_INR_market_name : "USDTINR",
       headers: [
           {text: 'Coin name',value: 'coin_name', align: 'start' },
           { text: 'USDT Price', value: 'usdt_price' },
@@ -318,63 +370,24 @@ export default {
       user_owned_coins:[],
       user_available_coin: 0,
       predicted_profit: 0,
-      current_profit: 0,
-      market_order_book_intervals:[],
+      market_order_book_intervals_obj:[],
       order_book_data:{},
       fastest_usdt_price:0,
-      fastest_usdt_to_coin_price:0,
-      fastest_coint_to_inr:0
+      USDT_INR_market_name:  "USDTINR",
+      AltCoin_USDT_market_name:  "",
+      INR_AltCoin_market_name:  "",
+      current_USDT_INR_price:  0,
+      current_AltCoin_USDT_price:  0,
+      current_INR_AltCoin_price:  0
     }
   },
   mounted(){
-    this.__get_market_details();
-    this.__get_user_details();
-    setInterval(()=>{ this.__get_market_ticker() }, this.ticker_frequency);
+    this.get_market_details();
+    this.get_user_details();
+    setInterval(()=>{ this.get_market_ticker() }, this.ticker_frequency);
   },
   methods:{
-    buy_usdt(price_per_unit , quantity){
-
-      axios.post(this.cors_server_url+'http://172.29.1.2:5000/buy_sell_coins', {
-        market : 'USDTINR',
-        price_per_unit : price_per_unit,
-        quantity : quantity
-      })
-      .then((response) => {
-        // console.log(response);
-        this.market_details = response.data;
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert("Issue in getting market data");
-      }) 
-
-    },
-    select_currency(item){
-      this.market_order_book_intervals.forEach(element => {
-        clearInterval(element);
-      });
-      this.market_order_book_intervals=[];
-      console.log(item);
-      this.selected_coin = item;
-      this.predicted_profit = item['p&l'];
-      this.order_book_data = {};
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['USDT']['pair'], "Bids"); }, 2000));
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book(this.coin_of_interest[item['coin_name']]['INR']['pair'], "Asks"); }, 2000));
-      this.market_order_book_intervals.push(setInterval(()=>{ this.__get_order_book("I-USDT_INR", "Bids"); }, 2000));
-    },
-    __get_market_details(){
-      this.loading_data = true;
-      axios.get(this.cors_server_url+this.baseurl+'/exchange/v1/markets_details')
-      .then((response) => {
-        // console.log(response);
-        // console.log("GOt market Data");
-        this.market_details = response.data;
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert("Issue in getting market data");
-      }) 
-    },
+    // Processing functions
     __filter_coins(){
       
       let coin_of_interest = {}
@@ -382,12 +395,12 @@ export default {
       for(let coin of this.market_details){
         this.coin_market_name_mapping[coin["symbol"]] = coin["target_currency_name"];
         if( coin["pair"].includes("INR") && !(coin["target_currency_name"] in coin_of_interest))
-          coin_of_interest[coin["target_currency_name"]] = {"INR": {"pair":coin["pair"], "order_types":coin["order_types"]}, "currency":coin["target_currency_short_name"]}
+          coin_of_interest[coin["target_currency_name"]] = {"INR": {"pair":coin["pair"], "order_types":coin["order_types"], "market": coin["symbol"]}, "currency":coin["target_currency_short_name"]}
       }
 
       for(let coin of this.market_details){
         if( coin["pair"].includes("USDT") && coin["target_currency_name"] in coin_of_interest){
-          coin_of_interest[coin["target_currency_name"]]["USDT"] = {"pair":coin["pair"], "order_types":coin["order_types"]}
+          coin_of_interest[coin["target_currency_name"]]["USDT"] = {"pair":coin["pair"], "order_types":coin["order_types"], "market": coin["symbol"]}
         }
       }
 
@@ -400,47 +413,6 @@ export default {
       this.coin_of_interest = coin_of_interest;
       this.loading_data = false;
     },
-    __get_order_book(pair, trade_type){
-      axios.get(this.public_baseurl+"/market_data/orderbook?pair="+pair)
-      .then((response) => {
-        // console.log("GOt order book details for " + pair);
-        this.order_book_data[pair] = {"bids":[], "asks":[]};
-        Object.entries(response.data.bids).forEach(([price, qty]) => { this.order_book_data[pair]["bids"].push({"qty":qty, "price": price}); });
-        Object.entries(response.data.asks).forEach(([price, qty]) => { this.order_book_data[pair]["asks"].push({"qty":qty, "price": price}); });
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert("Issue in getting order book data of "+pair);
-      }) 
-    },
-    __get_trade_history(pair, limi=30){
-      axios.get(this.public_baseurl+"/market_data/trade_history",{
-        pair: pair,
-        limit:limit
-      })
-      .then((response) => {
-        // console.log(response);
-        console.log("GOt trade details for " + pair);
-        this.coin_trade_history[pair] = response.data;
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert("Issue in getting trade history data");
-      }) 
-    },
-    __get_market_ticker(){
-      axios.get(this.baseurl+"/exchange/ticker")
-      .then((response) => {
-        // console.log(response);
-        // console.log("GOt tiker details");
-        // this.ticker_data = response.data;
-        this.__process_ticker_data(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert("Issue in getting ticker data");
-      }) 
-    },
     __process_ticker_data(ticker_data){    
       
       let temp_data = Object.assign({}, this.coin_of_interest);
@@ -448,37 +420,31 @@ export default {
       for(let index in ticker_data){
         let market = ticker_data[index];
         if(market==undefined) break;
-        if(market['market']==this.USDT_INR_market_name) this.USDT_INR_price = market['last_price']; 
+        if(market['market']==this.USDT_INR_market_name) this.current_USDT_INR_price = market['last_price']; 
+        if(market['market']==this.AltCoin_USDT_market_name) this.current_AltCoin_USDT_price = market['last_price'];
+        if(market['market']==this.INR_AltCoin_market_name) this.current_INR_AltCoin_price = market['last_price'];
         if(this.coin_market_name_mapping[market['market']] in temp_data){
           if(market['market'].includes("INR"))temp_data[this.coin_market_name_mapping[market['market']]]['INR']['last_price'] = market['last_price'];
           if(market['market'].includes("USDT")) temp_data[this.coin_market_name_mapping[market['market']]]['USDT']['last_price'] = market['last_price']; 
         }
       }
-
       this.coin_of_interest = temp_data;
-
+      
     },
-    __get_user_details(){
-      axios.post(this.cors_server_url+'http://172.29.1.2:5000/user_details')
-      .then((response) => {
-        // console.log(response);
-        this.user_owned_coins = response.data;
-        // console.log("GOt user details");
-        // this.ticker_data = response.data;
-      })
-      .catch(function (error) {
-        console.log(error);
-        alert("Issue in getting User data");
-      }) 
+    __evaluate_user_available_coin(){
+        if(!this.selected_coin) return 0;
+        let currency = this.selected_coin.currency;
+        if(this.user_owned_coins.length == 0) return 0;
+        let coin = this.user_owned_coins.filter((coin)=> {  return coin.currency == currency });
+        this.user_available_coin =  coin[0]["balance"]
     },
-    evaluate_coin_prices(pair){
-      // console.log("Evaluating the market prices");
+    __evaluate_coin_prices(){
       let new_prices = [];
 
       for(let coin in this.coin_of_interest){
         
-        let transaction_fee = (this.USDT_INR_price * this.num_of_USDT) / 1000 // fee is 0.1%
-        let inr_invested = (this.USDT_INR_price * this.num_of_USDT) + transaction_fee // INR -> USDT 
+        let transaction_fee = (this.current_USDT_INR_price * this.num_of_USDT) / 1000 // fee is 0.1%
+        let inr_invested = (this.current_USDT_INR_price * this.num_of_USDT) + transaction_fee // INR -> USDT 
         
         transaction_fee = this.num_of_USDT / 500 // fee is 0.2%          
         let num_of_AltCoin = (this.num_of_USDT - transaction_fee) / this.coin_of_interest[coin]['USDT']['last_price'] //USDT -> AltCoin
@@ -496,19 +462,102 @@ export default {
           "usdt_order_type" : this.coin_of_interest[coin]['USDT']['order_types'],
           "invested_&_returned" : inr_returned.toFixed(3).toString()+" - "+inr_invested.toFixed(3).toString(),
           "p&l" : p_and_l.toFixed(3),
-          "currency" : this.coin_of_interest[coin].currency
+          "currency" : this.coin_of_interest[coin].currency,
+          "INR_market" : this.coin_of_interest[coin]['INR']["market"],
+          "USDT_market" : this.coin_of_interest[coin]['USDT']["market"]
         });
       }
 
       this.coin_price_data = new_prices;
     },
-    evaluate_user_available_coin(){
-        if(!this.selected_coin) return 0;
-        console.log("Currency changed value changed");
-        let currency = this.selected_coin.currency;
-        if(this.user_owned_coins.length == 0) return 0;
-        let coin = this.user_owned_coins.filter((coin)=> {  return coin.currency == currency });
-        this.user_available_coin =  coin[0]["balance"]
+    // Action functions
+    get_market_details(){
+      this.loading_data = true;
+      axios.get(this.cors_server_url+this.baseurl+'/exchange/v1/markets_details')
+      .then((response) => {
+        // console.log(response);
+        // console.log("GOt market Data");
+        this.market_details = response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert("Issue in getting market data");
+      }) 
+    },
+    get_order_book(pair, trade_type){
+      axios.get(this.public_baseurl+"/market_data/orderbook?pair="+pair)
+      .then((response) => {
+        // console.log("GOt order book details for " + pair);
+        this.order_book_data[pair] = {"bids":[], "asks":[], "current_price":0};
+        Object.entries(response.data.bids).forEach(([price, qty]) => { this.order_book_data[pair]["bids"].push({"qty":qty, "price": price}); });
+        Object.entries(response.data.asks).forEach(([price, qty]) => { this.order_book_data[pair]["asks"].push({"qty":qty, "price": price}); });
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert("Issue in getting order book data of "+pair);
+      }) 
+    },
+    get_market_ticker(){
+      axios.get(this.baseurl+"/exchange/ticker")
+      .then((response) => {
+        // console.log(response);
+        // console.log("GOt tiker details");
+        // this.ticker_data = response.data;
+        this.__process_ticker_data(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert("Issue in getting ticker data");
+      }) 
+    },
+    select_currency(item){
+
+      console.log(item);
+
+      this.market_order_book_intervals_obj.forEach(interval_obj => {
+        clearInterval(interval_obj);
+      });
+      this.market_order_book_intervals_obj=[];
+
+      this.selected_coin = item;
+      this.predicted_profit = item['p&l'];
+      this.order_book_data = {};
+
+      this.AltCoin_USDT_market_name = item["USDT_market"] ;
+      this.INR_AltCoin_market_name = item["INR_market"];
+
+      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.coin_of_interest[item['coin_name']]['USDT']['pair'], "Bids"); }, 1000));
+      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.coin_of_interest[item['coin_name']]['INR']['pair'], "Asks"); }, 1000));
+      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book("I-USDT_INR", "Bids"); }, 1000));
+
+    },
+    get_user_details(){
+      axios.post(this.cors_server_url+'http://172.29.1.2:5000/user_details')
+      .then((response) => {
+        // console.log(response);
+        this.user_owned_coins = response.data;
+        // console.log("GOt user details");
+        // this.ticker_data = response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert("Issue in getting User data");
+      }) 
+    },
+    get_trade_history(pair, limi=30){
+      axios.get(this.public_baseurl+"/market_data/trade_history",{
+        pair: pair,
+        limit:limit
+      })
+      .then((response) => {
+        // console.log(response);
+        console.log("GOt trade details for " + pair);
+        this.coin_trade_history[pair] = response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert("Issue in getting trade history data");
+      }) 
     },
   },
   computed:{
@@ -522,35 +571,18 @@ export default {
         let inr_coin = this.user_owned_coins.filter((coin)=> {  return coin.currency == "USDT" });
         return inr_coin[0]["balance"]
     },
-    selected_coin_current_order_book_cal(){
-      this.fastest_usdt_price
-
-      return 0
-    },
-    current_profit(){
-      // for((order_book, key) in order_book_data){
-      //   for(order){
-
-      //   }
-      // }
-      return 0
-    }
   },
   watch:{
     market_details(){
 
       this.__filter_coins();
     },
-    ticker_data(){
-      console.log("Ticker changed");
-    },
     coin_of_interest(){
-      // console.log("Evaluated the values");
-      this.evaluate_coin_prices();
-      this.evaluate_user_available_coin();
+      this.__evaluate_coin_prices();
+      this.__evaluate_user_available_coin();
     },
     num_of_USDT(){
-      this.evaluate_coin_prices();
+      this.__evaluate_coin_prices();
     }
   }
 }
