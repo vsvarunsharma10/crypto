@@ -89,9 +89,27 @@
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
+                  <v-list-item-title> USDT Buy Cost </v-list-item-title>
+                  <v-list-item-subtitle class="text-right">
+                    {{ proccessed_USDT_buy_cost }}
+                  </v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title> Altcoin Qty needed to buy </v-list-item-title>
+                  <v-list-item-subtitle class="text-right">
+                    {{ proccessed_USDT_Altcoin_buy_qty }}
+                  </v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title> INR Return </v-list-item-title>
+                  <v-list-item-subtitle class="text-right">
+                    {{ proccessed_Altcoin_INR_sell_amount }}
+                  </v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title> Current Profit </v-list-item-title>
                   <v-list-item-subtitle class="text-right">
-                    {{ predicted_profit }}
+                    {{ current_profit }}
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>
@@ -130,7 +148,7 @@
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
-                            :items='order_book_data["I-USDT_INR"]["asks"]'
+                            :items='order_book_data[USDT_INR_pair_name]["asks"]'
                             item-key="name"
                             :sort-by="['price']"
                             :sort-desc="[true]"
@@ -164,7 +182,7 @@
                           <v-data-table
                             dense
                             :headers='[{"text": "Price", "value":"price"}, {"text":"Qty", "value":"qty"}]'
-                            :items='order_book_data["I-USDT_INR"]["bids"]'
+                            :items='order_book_data[USDT_INR_pair_name]["bids"]'
                             item-key="name"
                             :sort-by="['price']"
                             :sort-desc="[true]"
@@ -376,9 +394,15 @@ export default {
       USDT_INR_market_name:  "USDTINR",
       AltCoin_USDT_market_name:  "",
       INR_AltCoin_market_name:  "",
+      USDT_INR_pair_name : "I-USDT_INR",
+      AltCoin_USDT_pair_name:  "",
+      INR_AltCoin_pair_name:  "",
       current_USDT_INR_price:  0,
       current_AltCoin_USDT_price:  0,
-      current_INR_AltCoin_price:  0
+      current_INR_AltCoin_price:  0,
+      proccessed_INR_USDT_buy_cost : 0,
+      proccessed_USDT_Altcoin_buy_qty : 0,
+      proccessed_Altcoin_INR_sell_amount : 0
     }
   },
   mounted(){
@@ -470,6 +494,115 @@ export default {
 
       this.coin_price_data = new_prices;
     },
+    __evaluate_current_profit_data_points(pair){
+
+      let USDT_INR = [];
+      if(pair in this.order_book_data) USDT_INR = this.order_book_data[this.USDT_INR_pair_name]['asks'];
+      USDT_INR.sort();
+      USDT_INR.reverse();
+      let altcoin_USDT = [];
+
+      if(pair in this.order_book_data) altcoin_USDT = this.order_book_data[this.AltCoin_USDT_pair_name]['asks'];
+      altcoin_USDT.sort();
+      altcoin_USDT.reverse();
+      let INR_altcoin = [];
+
+      if(pair in this.order_book_data) INR_altcoin = this.order_book_data[this.INR_AltCoin_pair_name]['bids'];
+      INR_altcoin.sort();
+
+
+      // =>
+      // =>
+      // => => REMEBER TO INCLUDE TRANSACTION FEES   <<<<<<----------------------
+      // =>
+      // =>
+      
+      // Get no. of orders and there details needed to complete the transaction
+
+
+      let remaining_qty = this.num_of_USDT;
+      let total_USDT_included = 0;
+      let USDT_cost = 0;
+
+      // INR -> USDT Orders
+      USDT_INR.forEach(order_data => {
+        if(remaining_qty == 0 || total_USDT_included == this.num_of_USDT || total_USDT_included > this.num_of_USDT) return;
+        if(remaining_qty < 0 ) {
+          alert("Remaining qty went negative, SOmething wrong happened");
+          return;
+        }
+
+        let order_qty = parseFloat(order_data['qty']);
+
+        if(remaining_qty >= order_qty){
+          USDT_cost += order_data['price'] * order_qty;
+          total_USDT_included += order_qty;
+          remaining_qty -= order_qty;
+        }
+        else if(remaining_qty < order_qty){
+          USDT_cost += remaining_qty * order_data['price'];
+          total_USDT_included += remaining_qty;
+          remaining_qty -= remaining_qty;// to know remaining_qty is completed
+        }
+
+      });
+
+      this.proccessed_USDT_buy_cost = USDT_cost;
+
+
+      let total_USDT_needed = 0;
+      let remaining_USDT = total_USDT_included;
+      let Altcoin_qty_included = 0;
+
+      // USDT -> Altcoin Orders
+      altcoin_USDT.forEach(order_data => {
+        if(remaining_USDT == 0 || total_USDT_needed >= total_USDT_included) return;
+
+        let order_qty = parseFloat(order_data['qty']);
+        let USDT_needed_for_current_order = order_qty * order_data['price']; // Calculate the USDT needed for the altcoin qty in this iteration
+        
+        if(USDT_needed_for_current_order <= remaining_USDT){
+          Altcoin_qty_included = Altcoin_qty_included + order_qty;
+          remaining_USDT = remaining_USDT - USDT_needed_for_current_order;
+          total_USDT_needed += USDT_needed_for_current_order;
+        }
+        else if(USDT_needed_for_current_order > remaining_USDT){
+          let Altcoin_qty_affordable = remaining_USDT / order_data['price'];
+          Altcoin_qty_included += Altcoin_qty_affordable;
+          total_USDT_needed += Altcoin_qty_affordable * order_data['price']
+          remaining_USDT -= remaining_USDT;
+        }
+
+      });
+
+      this.proccessed_USDT_Altcoin_buy_qty = Altcoin_qty_included;
+
+
+      let remaining_altcoin_qty = Altcoin_qty_included;
+      let total_altcoin_qty_included = 0;
+      let INR_return = 0;
+      // Altcoin -> INR Orders
+      INR_altcoin.forEach(order_data => {
+        if(remaining_altcoin_qty == 0 || total_altcoin_qty_included >= Altcoin_qty_included) return;
+
+        let order_qty = parseFloat(order_data['qty']);
+
+        if(remaining_altcoin_qty >= parseFloat(order_data['qty'])){
+          INR_return += order_data['price'] * parseFloat(order_data['qty']);
+          total_altcoin_qty_included += parseFloat(order_data['qty'])
+          remaining_altcoin_qty -= parseFloat(order_data['qty']);
+        }
+        else if(remaining_altcoin_qty < parseFloat(order_data['qty'])){
+          INR_return += remaining_altcoin_qty * order_data['price'];
+          total_altcoin_qty_included += remaining_altcoin_qty;
+          remaining_altcoin_qty -= remaining_altcoin_qty;
+        }
+        
+      });
+        
+      this.proccessed_Altcoin_INR_sell_amount = INR_return;
+
+    },
     // Action functions
     get_market_details(){
       this.loading_data = true;
@@ -491,6 +624,7 @@ export default {
         this.order_book_data[pair] = {"bids":[], "asks":[], "current_price":0};
         Object.entries(response.data.bids).forEach(([price, qty]) => { this.order_book_data[pair]["bids"].push({"qty":qty, "price": price}); });
         Object.entries(response.data.asks).forEach(([price, qty]) => { this.order_book_data[pair]["asks"].push({"qty":qty, "price": price}); });
+        this.__evaluate_current_profit_data_points(pair);  
       })
       .catch(function (error) {
         console.log(error);
@@ -512,7 +646,7 @@ export default {
     },
     select_currency(item){
 
-      console.log(item);
+      // console.log(item);
 
       this.market_order_book_intervals_obj.forEach(interval_obj => {
         clearInterval(interval_obj);
@@ -526,9 +660,12 @@ export default {
       this.AltCoin_USDT_market_name = item["USDT_market"] ;
       this.INR_AltCoin_market_name = item["INR_market"];
 
-      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.coin_of_interest[item['coin_name']]['USDT']['pair'], "Bids"); }, 1000));
-      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.coin_of_interest[item['coin_name']]['INR']['pair'], "Asks"); }, 1000));
-      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book("I-USDT_INR", "Bids"); }, 1000));
+      this.AltCoin_USDT_pair_name = this.coin_of_interest[item['coin_name']]['USDT']['pair'];
+      this.INR_AltCoin_pair_name = this.coin_of_interest[item['coin_name']]['INR']['pair']
+
+      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.AltCoin_USDT_pair_name, "Bids"); }, 10000));
+      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.INR_AltCoin_pair_name, "Asks"); }, 10000));
+      this.market_order_book_intervals_obj.push(setInterval(()=>{ this.get_order_book( this.USDT_INR_pair_name, "Bids"); }, 10000));
 
     },
     get_user_details(){
@@ -558,7 +695,7 @@ export default {
         console.log(error);
         alert("Issue in getting trade history data");
       }) 
-    },
+    }
   },
   computed:{
     user_available_inr(){
@@ -571,6 +708,14 @@ export default {
         let inr_coin = this.user_owned_coins.filter((coin)=> {  return coin.currency == "USDT" });
         return inr_coin[0]["balance"]
     },
+    current_profit() {
+      return this.proccessed_Altcoin_INR_sell_amount - this.proccessed_USDT_buy_cost;
+    },
+    // prediction_accuracy() {
+    //   if(current_profit == 0 || proccessed_Altcoin_INR_sell_amount == 0) return 0;
+    //   else if(proccessed_Altcoin_INR_sell_amount == proccessed_USDT_buy_cost) return 100;
+    //   return current -
+    // }
   },
   watch:{
     market_details(){

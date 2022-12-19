@@ -14,9 +14,10 @@ import requests
 app = Flask(__name__)
 
 # Enter your API Key and Secret here. If you don't have one, you can generate it from the website.
-KEY = "e6c1c79da1dccbd8cf60144293e3768e349c82415b460617"
-SECRET = "97d13bbc79f1ef609fe7054744a66c1331323c55c959a9ad61df1e9d76187288"
-SECRET_BYTES = bytes(SECRET, encoding='utf-8')
+KEY = ""
+SECRET = ""
+
+
 
 
 @app.route('/', methods=['GET', 'POST'])
